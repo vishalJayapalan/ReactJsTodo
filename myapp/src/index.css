@@ -1,0 +1,36 @@
+body {
+  /* background-color: lightgray; */
+  margin: 0;
+  padding: 0;
+}
+nav {
+  background-color: slategray;
+  display: flex;
+  justify-content: space-between;
+}
+.newInputList {
+  margin-top: 10px;
+  margin-left: 25%;
+  width: 50%;
+}
+.listContainer {
+  display: flex;
+  flex-wrap: wrap;
+}
+.individualList {
+  margin: 10px;
+}
+
+.tasksInList {
+  border-style: inset;
+  background-color: rgb(160, 175, 197);
+  border-radius: 5px;
+  height: 125px;
+  width: 125px;
+}
+.fas:hover {
+  font-size: 110%;
+}
+.listName {
+  display: inline;
+}

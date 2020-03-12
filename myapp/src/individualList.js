@@ -3,8 +3,12 @@ import React from 'react'
 class IndividualList extends React.Component {
   render () {
     return (
-      <div>
-        <p>{this.props.list.listName}</p>
+      <div className='individualList'>
+        <div className='tasksInList' />
+        <div className='listNameContainer'>
+          <i className='fas fa-archive' />
+          <p className='listName'>{this.props.list.listName}</p>
+        </div>
       </div>
     )
   }

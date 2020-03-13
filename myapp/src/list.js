@@ -3,29 +3,45 @@ import IndividualList from './individualList'
 
 export default class List extends React.Component {
   listShower (list) {
-    return <IndividualList key={list.listId} list={list} />
+    return (
+      <IndividualList
+        key={list.listId}
+        list={list}
+        onHandleUpdate={this.props.handleUpdate}
+        onHandleUpdateInput={this.props.handleUpdateInput}
+        onHandleClick={this.props.handleDelete}
+        onOpenTask={this.props.handleTaskOpen}
+      />
+    )
   }
 
   render () {
-    return (
-      <div className='listPage'>
-        <nav className='listNav'>
-          <button className='createListBtn'>CreateList</button>
-          <button className='searchListBtn'>Search</button>
-        </nav>
-
+    let button
+    if (this.props.listInput) {
+      button = (
         <input
+          autoFocus
           className='newInputList'
           type='text'
           placeholder='Please enter a List Name'
           onKeyUp={e => {
-            return this.props.handleEnter(e)
+            return this.props.handleCreate(e)
           }}
         />
-        <p>Page loaded at {this.props.date}</p>
+      )
+    }
+    return (
+      <div className='listPage'>
+        <nav className='listNav'>
+          <button className='createListBtn' onClick={this.props.handleCreate}>
+            CreateList
+          </button>
+          <button className='searchListBtn'>Search</button>
+        </nav>
+        {button}
         <div className='listContainer'>
-          {this.props.list.map(l => {
-            return this.listShower(l)
+          {this.props.lists.map(list => {
+            return this.listShower(list)
           })}
         </div>
       </div>

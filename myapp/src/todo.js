@@ -7,7 +7,6 @@ class Todo extends React.Component {
     super(props)
     this.state = {
       inTask: null,
-      // currentListId: 1,
       listId: 2,
       taskId: 3,
       lists: [
@@ -38,12 +37,12 @@ class Todo extends React.Component {
         },
         {
           listId: 2,
-          listName: 'weekEnd',
+          listName: 'Today',
           inputToggle: true,
           tasks: [
             {
               taskId: 3,
-              taskName: 'kerala',
+              taskName: 'Tasks',
               checkbox: 'false',
               priority: 'none',
               date: 'false',
@@ -55,10 +54,11 @@ class Todo extends React.Component {
       ],
       listInput: false
     }
+    // this.handleUpdateInput = this.handleUpdateInput.bind(this)
   }
 
-  handleDeleteList (event) {
-    const listId = event.target.parentNode.parentNode.id
+  handleDeleteList (listId) {
+    // listId
     const list = this.state.lists.slice().filter(a => a.listId !== +listId)
     this.setState({ lists: list })
   }
@@ -84,9 +84,10 @@ class Todo extends React.Component {
     }
   }
 
-  handleUpdateInput (event) {
+  handleUpdateInput (listId) {
+    // listId
     const lists = this.state.lists.slice().map(a => {
-      if (a.listId === +event.target.parentNode.parentNode.id) {
+      if (a.listId === +listId) {
         a.inputToggle = !a.inputToggle
       }
       return a
@@ -94,11 +95,12 @@ class Todo extends React.Component {
     this.setState({ lists: lists })
   }
 
-  handleUpdateList (event) {
+  handleUpdateList (event, listId) {
+    // event , listId
     if (event.target.value) {
       if (event.keyCode === 13) {
         const lists = this.state.lists.slice().map(a => {
-          if (a.listId === +event.target.parentNode.parentNode.id) {
+          if (a.listId === +listId) {
             a.inputToggle = !a.inputToggle
             a.listName = event.target.value
           }
@@ -109,12 +111,13 @@ class Todo extends React.Component {
     }
   }
 
-  taskOpen (event) {
-    // console.log(event.target)
-    this.setState({ inTask: event.target.parentNode.id })
+  openTask (listId) {
+    this.setState({
+      inTask: listId
+    })
   }
 
-  back (event) {
+  back () {
     this.setState({ inTask: null })
   }
 
@@ -124,7 +127,6 @@ class Todo extends React.Component {
       const lists = this.state.lists.slice()
       for (const list of lists) {
         if (list.listId === +this.state.inTask) {
-          console.log(list)
           list.tasks.push({
             taskId: this.state.taskId + 1,
             taskName: event.target.value,
@@ -142,6 +144,27 @@ class Todo extends React.Component {
     }
   }
 
+  handleDeleteTask (listId, taskId) {
+    const lists = this.state.lists.slice()
+    let index = 0
+    let actualIndex
+
+    const currentList = this.state.lists.slice().filter(list => {
+      if (list.listId === +listId) {
+        actualIndex = index
+      }
+      index++
+      return list.listId === +listId
+    })
+    const tasks = currentList[0].tasks.filter(task => task.taskId !== +taskId)
+    currentList[0].tasks = tasks
+    console.log(actualIndex)
+    console.log(currentList, 'currentList')
+    console.log(lists, 'lists')
+    lists[actualIndex] = currentList[0]
+    this.setState({ lists: lists })
+  }
+
   render () {
     let listOrTask
     if (this.state.inTask === null) {
@@ -149,11 +172,11 @@ class Todo extends React.Component {
         <List
           lists={this.state.lists}
           listInput={this.state.listInput}
-          handleDelete={e => this.handleDeleteList(e)}
+          handleDelete={listId => this.handleDeleteList(listId)}
           handleCreate={e => this.handleCreateList(e)}
-          handleUpdate={e => this.handleUpdateList(e)}
+          handleUpdate={(e, listId) => this.handleUpdateList(e, listId)}
           handleUpdateInput={e => this.handleUpdateInput(e)}
-          handleTaskOpen={e => this.taskOpen(e)}
+          handleOpenTask={e => this.openTask(e)}
         />
       )
     } else {
@@ -162,19 +185,18 @@ class Todo extends React.Component {
       const list = this.state.lists.slice()
       for (let i = 0; i < list.length; i++) {
         if (this.state.lists[i].listId === +this.state.inTask) {
-          console.log(this.state.inTask)
           listName = this.state.lists[i].listName
           count = i
           break
         }
       }
-      console.log(count)
       listOrTask = (
         <Task
           tasks={this.state.lists[count].tasks}
           listName={listName}
-          handleBack={e => this.back(e)}
+          handleBack={() => this.back()}
           handleCreateTask={e => this.handleCreateTask(e)}
+          deleteTask={(listId, taskId) => this.handleDeleteTask(listId, taskId)}
         />
       )
     }

@@ -21,7 +21,11 @@ export default class Task extends React.Component {
         />
         <div className='taskContainer'>
           {this.props.tasks.map(task => (
-            <IndividualTask key={task.taskId} task={task} />
+            <IndividualTask
+              key={task.taskId}
+              task={task}
+              deleteTask={this.props.deleteTask}
+            />
           ))}
         </div>
       </div>

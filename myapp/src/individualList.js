@@ -5,7 +5,10 @@ class IndividualList extends React.Component {
     let nameToggle
     if (this.props.list.inputToggle) {
       nameToggle = (
-        <p className='listName' onClick={this.props.onHandleUpdateInput}>
+        <p
+          className='listName'
+          onClick={() => this.props.onHandleUpdateInput(this.props.list.listId)}
+        >
           {this.props.list.listName}
         </p>
       )
@@ -16,13 +19,17 @@ class IndividualList extends React.Component {
           className='listNameInput'
           type='text'
           defaultValue={this.props.list.listName}
-          onKeyUp={this.props.onHandleUpdate}
+          onKeyUp={e => this.props.onHandleUpdate(e, this.props.list.listId)}
+          // event,listId
         />
       )
     }
     return (
       <div className='individualList' id={this.props.list.listId}>
-        <div className='tasksInList' onClick={this.props.onOpenTask}>
+        <div
+          className='tasksInList'
+          onClick={() => this.props.onOpenTask(this.props.list.listId)}
+        >
           {this.props.list.tasks.map(task => (
             <p key={task.taskId} className='taskInList'>
               {task.taskName}
@@ -30,7 +37,10 @@ class IndividualList extends React.Component {
           ))}
         </div>
         <div className='listNameContainer'>
-          <i className='fas fa-archive' onClick={this.props.onHandleClick} />
+          <i
+            className='fas fa-archive'
+            onClick={() => this.props.onHandleDelete(this.props.list.listId)}
+          />
           {nameToggle}
         </div>
       </div>

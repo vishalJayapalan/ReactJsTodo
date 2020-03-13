@@ -9,8 +9,8 @@ export default class List extends React.Component {
         list={list}
         onHandleUpdate={this.props.handleUpdate}
         onHandleUpdateInput={this.props.handleUpdateInput}
-        onHandleClick={this.props.handleDelete}
-        onOpenTask={this.props.handleTaskOpen}
+        onHandleDelete={this.props.handleDelete}
+        onOpenTask={this.props.handleOpenTask}
       />
     )
   }

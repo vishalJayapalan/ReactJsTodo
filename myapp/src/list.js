@@ -24,9 +24,7 @@ export default class List extends React.Component {
           className='newInputList'
           type='text'
           placeholder='Please enter a List Name'
-          onKeyUp={e => {
-            return this.props.handleCreate(e)
-          }}
+          onKeyUp={this.props.handleCreate}
         />
       )
     }

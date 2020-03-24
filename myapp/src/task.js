@@ -2,7 +2,16 @@ import React from 'react'
 import IndividualTask from './individualTask'
 
 export default class Task extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      tasks: this.props.tasks,
+      listName: this.props.listName
+    }
+  }
+
   render () {
+    // console.log(this.state)
     return (
       <div>
         <nav className='taskNav'>
@@ -11,7 +20,7 @@ export default class Task extends React.Component {
           </button>
           <button className='clearCompletedBtn'>ClearCompleted</button>
         </nav>
-        <p>{this.props.listName.toUpperCase()}</p>
+        <p className='showListName'>{this.props.listName.toUpperCase()}</p>
         <input
           autoFocus
           type='text'
@@ -25,6 +34,8 @@ export default class Task extends React.Component {
               key={task.taskId}
               task={task}
               deleteTask={this.props.deleteTask}
+              updateTask={this.props.updateTask}
+              updateTaskChecked={this.props.updateTaskChecked}
             />
           ))}
         </div>

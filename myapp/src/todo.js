@@ -29,7 +29,7 @@ class Todo extends React.Component {
               taskName: 'orange',
               checkbox: 'false',
               priority: 'none',
-              date: 'false',
+              date: false,
               listId: 1,
               notes: ''
             }
@@ -43,7 +43,7 @@ class Todo extends React.Component {
             {
               taskId: 3,
               taskName: 'Tasks',
-              checkbox: 'false',
+              checkbox: false,
               priority: 'none',
               date: 'false',
               listId: 2,
@@ -59,7 +59,7 @@ class Todo extends React.Component {
 
   handleDeleteList (listId) {
     // listId
-    const list = this.state.lists.slice().filter(a => a.listId !== +listId)
+    const list = this.state.lists.filter(a => a.listId !== +listId)
     this.setState({ lists: list })
   }
 
@@ -78,7 +78,8 @@ class Todo extends React.Component {
             inputToggle: true,
             tasks: []
           }
-        ]
+        ],
+        listInput: false
       })
       event.target.value = ''
     }
@@ -86,7 +87,7 @@ class Todo extends React.Component {
 
   handleUpdateInput (listId) {
     // listId
-    const lists = this.state.lists.slice().map(a => {
+    const lists = this.state.lists.map(a => {
       if (a.listId === +listId) {
         a.inputToggle = !a.inputToggle
       }
@@ -99,12 +100,12 @@ class Todo extends React.Component {
     // event , listId
     if (event.target.value) {
       if (event.keyCode === 13) {
-        const lists = this.state.lists.slice().map(a => {
-          if (a.listId === +listId) {
-            a.inputToggle = !a.inputToggle
-            a.listName = event.target.value
+        const lists = this.state.lists.map(list => {
+          if (list.listId === +listId) {
+            list.inputToggle = !list.inputToggle
+            list.listName = event.target.value
           }
-          return a
+          return list
         })
         this.setState({ lists: lists })
       }
@@ -117,7 +118,7 @@ class Todo extends React.Component {
     })
   }
 
-  back () {
+  handleBack () {
     this.setState({ inTask: null })
   }
 
@@ -130,39 +131,63 @@ class Todo extends React.Component {
           list.tasks.push({
             taskId: this.state.taskId + 1,
             taskName: event.target.value,
-            checkbox: 'false',
+            checkbox: false,
             priority: 'none',
-            date: 'false',
+            date: false,
             listId: list.listId,
             notes: ''
           })
         }
       }
       event.target.value = ''
-      this.setState({ taskId: taskId })
-      this.setState({ lists: lists })
+      this.setState({ taskId: taskId, lists: lists })
     }
   }
 
   handleDeleteTask (listId, taskId) {
     const lists = this.state.lists.slice()
-    let index = 0
-    let actualIndex
 
-    const currentList = this.state.lists.slice().filter(list => {
-      if (list.listId === +listId) {
-        actualIndex = index
-      }
-      index++
-      return list.listId === +listId
+    const list = this.state.lists.find(l => l.listId === listId)
+    const listIndex = this.state.lists.findIndex(l => l.listId === listId)
+
+    list.tasks = list.tasks.filter(t => t.taskId !== taskId)
+    lists[listIndex] = list
+
+    this.setState({
+      lists
     })
-    const tasks = currentList[0].tasks.filter(task => task.taskId !== +taskId)
-    currentList[0].tasks = tasks
-    console.log(actualIndex)
-    console.log(currentList, 'currentList')
-    console.log(lists, 'lists')
-    lists[actualIndex] = currentList[0]
-    this.setState({ lists: lists })
+  }
+
+  handleUpdateTask (e, name, task) {
+    // console.log(e.target.value, name, task.taskId, task.listId)
+    const listId = task.listId
+    const taskId = task.taskId
+
+    const lists = this.state.lists.slice()
+    // console.log(lists)
+
+    const list = this.state.lists.find(l => l.listId === listId)
+    const listIndex = this.state.lists.findIndex(l => l.listId === listId)
+    // console.log(list, listIndex)
+    // console.log(list.tasks)
+    // // list.tasks = list.tasks.filter(t => t.taskId !== taskId)
+    list.tasks = list.tasks.map(t => {
+      // console.log(t)
+      if (t.taskId === taskId) {
+        t[name] = e.target.value
+      }
+      return t
+    })
+    // console.log(list.tasks)
+    lists[listIndex] = list
+    console.log(lists)
+    this.setState({
+      lists
+    })
+  }
+
+  handleUpdateTaskChecked (e) {
+    console.log(e.target)
   }
 
   render () {
@@ -194,9 +219,11 @@ class Todo extends React.Component {
         <Task
           tasks={this.state.lists[count].tasks}
           listName={listName}
-          handleBack={() => this.back()}
+          handleBack={() => this.handleBack()}
           handleCreateTask={e => this.handleCreateTask(e)}
           deleteTask={(listId, taskId) => this.handleDeleteTask(listId, taskId)}
+          updateTask={(e, name, task) => this.handleUpdateTask(e, name, task)}
+          updateTaskChecked={e => this.handleUpdateTaskChecked(e)}
         />
       )
     }

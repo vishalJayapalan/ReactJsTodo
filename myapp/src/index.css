@@ -58,6 +58,9 @@ nav {
   float: right;
   margin: 2%;
 }
+.showListName {
+  margin-left: 45%;
+}
 /* taskFeatures */
 .taskFeatures {
   display: grid;

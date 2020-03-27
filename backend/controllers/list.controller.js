@@ -1,9 +1,4 @@
 const router = require('express').Router()
-// const mongoose = require('mongoose')
-
-// const router = express.Router()
-
-// const express = require('express')
 const mongoose = require('mongoose')
 
 const List = mongoose.model('List')

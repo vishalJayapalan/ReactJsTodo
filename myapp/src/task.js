@@ -26,7 +26,11 @@ export default class Task extends React.Component {
           type='text'
           placeholder='Enter the taskName'
           className='taskInput'
-          onKeyUp={this.props.handleCreateTask}
+          onKeyUp={e => {
+            if (e.keyCode === 13 && e.target.value) {
+              this.props.handleCreateTask(e)
+            }
+          }}
         />
         <div className='taskContainer'>
           {this.props.tasks.map(task => (

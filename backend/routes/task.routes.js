@@ -1,19 +1,19 @@
-// const express = require('express')
-// const Router = express.Router()
+const express = require('express')
+const Router = express.Router()
 
-// const taskController = require('../controllers/task.controller.js')
+const taskController = require('../controllers/task.controller.js')
 
-// Router.get('/:listId/task/', taskController.getAllTasks)
+Router.get('/:_id', taskController.getAllTasks)
 
-// Router.post('/:listId/task/', taskController.createNewTask)
+Router.post('/:_id', taskController.createNewTask)
 
-// Router.put('/:listId/task/:taskId', taskController.updateTask)
+Router.put('/:_id/:taskId', taskController.updateTask)
 
-// Router.delete('/:listId/task/:taskId', taskController.deleteTask)
+Router.delete('/:_id/:taskId', taskController.deleteTask)
 
-// // Router.delete(
-// //   '/:listId/clearCompletedTasks/',
-// //   taskController.clearCompletedTasks
-// // )
+// Router.delete(
+//   '/:listId/clearCompletedTasks/',
+//   taskController.clearCompletedTasks
+// )
 
-// module.exports = Router
+module.exports = Router

@@ -9,107 +9,73 @@ class Todo extends React.Component {
       inTask: null,
       listId: 2,
       taskId: 3,
-      lists: [
-        {
-          listId: 1,
-          listName: 'shoppingList',
-          inputToggle: true,
-          tasks: [
-            {
-              taskId: 1,
-              taskName: 'apple',
-              checkbox: 'false',
-              priority: 'none',
-              date: 'false',
-              listId: 1,
-              notes: ''
-            },
-            {
-              taskId: 2,
-              taskName: 'orange',
-              checkbox: 'false',
-              priority: 'none',
-              date: false,
-              listId: 1,
-              notes: ''
-            }
-          ]
-        },
-        {
-          listId: 2,
-          listName: 'Today',
-          inputToggle: true,
-          tasks: [
-            {
-              taskId: 3,
-              taskName: 'Tasks',
-              checkbox: false,
-              priority: 'none',
-              date: 'false',
-              listId: 2,
-              notes: ''
-            }
-          ]
-        }
-      ],
+      lists: [],
       listInput: false
     }
     // this.handleUpdateInput = this.handleUpdateInput.bind(this)
   }
 
+  async componentDidMount () {
+    const data = await window.fetch('http://localhost:5000/list', {
+      method: 'get'
+    })
+    const jsonData = await data.json()
+    this.setState({ lists: jsonData })
+  }
+
   handleDeleteList (listId) {
     // listId
-    const list = this.state.lists.filter(a => a.listId !== +listId)
+    const list = this.state.lists.filter(a => a._id != listId)
     this.setState({ lists: list })
-  }
-
-  handleCreateList (event) {
-    if (event.target.className === 'createListBtn') {
-      this.setState({ listInput: !this.state.listInput })
-    }
-    if (event.keyCode === 13) {
-      this.setState({
-        listId: this.state.listId + 1,
-        lists: [
-          ...this.state.lists,
-          {
-            listId: this.state.listId + 1,
-            listName: event.target.value,
-            inputToggle: true,
-            tasks: []
-          }
-        ],
-        listInput: false
-      })
-      event.target.value = ''
-    }
-  }
-
-  handleUpdateInput (listId) {
-    // listId
-    const lists = this.state.lists.map(a => {
-      if (a.listId === +listId) {
-        a.inputToggle = !a.inputToggle
+    window.fetch(`http://localhost:5000/list/${listId}/`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
       }
-      return a
     })
-    this.setState({ lists: lists })
+  }
+
+  async handleCreateList (event) {
+    const listName = event.target.value
+    // console.log(listName)
+    const response = await window.fetch('http://localhost:5000/list/', {
+      method: 'POST',
+      body: JSON.stringify({ listName: listName }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    const jsonData = await response.json()
+    const listId = jsonData.listId
+    this.setState({
+      lists: [
+        ...this.state.lists,
+        {
+          _id: listId,
+          listName: listName,
+          tasks: []
+        }
+      ]
+    })
+    // event.target.value = ''
   }
 
   handleUpdateList (event, listId) {
-    // event , listId
-    if (event.target.value) {
-      if (event.keyCode === 13) {
-        const lists = this.state.lists.map(list => {
-          if (list.listId === +listId) {
-            list.inputToggle = !list.inputToggle
-            list.listName = event.target.value
-          }
-          return list
-        })
-        this.setState({ lists: lists })
+    const listName = event.target.value
+    const lists = this.state.lists.map(list => {
+      if (list._id == listId) {
+        list.listName = listName
       }
-    }
+      return list
+    })
+    this.setState({ lists: lists })
+    window.fetch(`http://localhost:5000/list/${listId}/`, {
+      method: 'PUT',
+      body: JSON.stringify({ listName: listName }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
   }
 
   openTask (listId) {
@@ -122,67 +88,83 @@ class Todo extends React.Component {
     this.setState({ inTask: null })
   }
 
-  handleCreateTask (event) {
-    if (event.keyCode === 13) {
-      const taskId = this.state.taskId + 1
-      const lists = this.state.lists.slice()
-      for (const list of lists) {
-        if (list.listId === +this.state.inTask) {
-          list.tasks.push({
-            taskId: this.state.taskId + 1,
-            taskName: event.target.value,
-            checkbox: false,
-            priority: 'none',
-            date: false,
-            listId: list.listId,
-            notes: ''
-          })
-        }
+  async handleCreateTask (event) {
+    const _id = this.state.inTask
+    const taskName = event.target.value
+    event.target.value = ''
+    const response = await window.fetch(`http://localhost:5000/task/${_id}`, {
+      method: 'POST',
+      body: JSON.stringify({ taskName, listId: _id }),
+      headers: {
+        'Content-Type': 'application/json'
       }
-      event.target.value = ''
-      this.setState({ taskId: taskId, lists: lists })
+    })
+    const jsonData = await response.json()
+    const taskId = jsonData.taskId
+    // console.log(taskId)
+    const lists = this.state.lists
+    for (const list of lists) {
+      if (list._id == this.state.inTask) {
+        list.tasks.push({
+          taskId,
+          taskName,
+          checkbox: false,
+          priority: 'none',
+          date: false,
+          listId: list._id,
+          notes: ''
+        })
+      }
     }
+    this.setState({ taskId, lists })
   }
 
-  handleDeleteTask (listId, taskId) {
-    const lists = this.state.lists.slice()
-
-    const list = this.state.lists.find(l => l.listId === listId)
-    const listIndex = this.state.lists.findIndex(l => l.listId === listId)
-
-    list.tasks = list.tasks.filter(t => t.taskId !== taskId)
+  handleDeleteTask (_id, taskId) {
+    const lists = this.state.lists
+    const list = this.state.lists.find(l => {
+      return l._id == _id
+    })
+    const listIndex = this.state.lists.findIndex(l => l._id == _id)
+    list.tasks = list.tasks.filter(t => t.taskId != taskId)
     lists[listIndex] = list
 
     this.setState({
       lists
     })
+    window.fetch(`http://localhost:5000/task/${_id}/${taskId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
   }
 
   handleUpdateTask (e, name, task) {
-    // console.log(e.target.value, name, task.taskId, task.listId)
     const listId = task.listId
     const taskId = task.taskId
-
+    // console.log(task)
     const lists = this.state.lists.slice()
-    // console.log(lists)
-
-    const list = this.state.lists.find(l => l.listId === listId)
-    const listIndex = this.state.lists.findIndex(l => l.listId === listId)
-    // console.log(list, listIndex)
-    // console.log(list.tasks)
-    // // list.tasks = list.tasks.filter(t => t.taskId !== taskId)
+    // const list = this.state.lists.find(l => l._id === listId)
+    const listIndex = this.state.lists.findIndex(l => l._id === listId)
+    const list = lists[listIndex]
     list.tasks = list.tasks.map(t => {
-      // console.log(t)
       if (t.taskId === taskId) {
         t[name] = e.target.value
       }
       return t
     })
-    // console.log(list.tasks)
     lists[listIndex] = list
-    console.log(lists)
+    // console.log(lists)
     this.setState({
       lists
+    })
+    console.log(task)
+    window.fetch(`http://localhost:5000/task/${listId}/${taskId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ task }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
     })
   }
 
@@ -209,7 +191,7 @@ class Todo extends React.Component {
       let listName
       const list = this.state.lists.slice()
       for (let i = 0; i < list.length; i++) {
-        if (this.state.lists[i].listId === +this.state.inTask) {
+        if (this.state.lists[i]._id == this.state.inTask) {
           listName = this.state.lists[i].listName
           count = i
           break

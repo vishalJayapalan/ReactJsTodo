@@ -1,46 +1,43 @@
-const router = require('express').Router()
-const mongoose = require('mongoose')
+const List = require('../models/lists.model')
 
-const List = mongoose.model('List')
-
-// const List = require('../models/lists.model')
-
-router.get('/', (req, res) => {
+const getLists = async (req, res) => {
   List.find()
     .then(list => res.json(list))
     .catch(err => res.status(400).json('Error: ' + err))
-})
+}
 
-// router.post('/', (req, res) => {
-//   const list = new List()
-//   console.log(list)
-//   list.id = req.body.id
-//   list.listname = req.body.listname
-//   list.tasks = []
-//   //   list.tasks.push(...req.body.tasks)
-//   list
-//     .save()
-//     .then(() => res.json('list added!'))
-//     .catch(err => res.status(400).json('Error: ' + err))
-// })
+const createList = async (req, res) => {
+  const list = new List()
+  list.listName = req.body.listName
+  list.tasks = []
+  list
+    .save()
+    .then(() => res.json({ listId: list._id }))
+    .catch(err => res.status(400).json('Error: ' + err))
+}
 
-// router.put('/:id', (req, res) => {
-//   const { listName } = req.body
-//   List.findById(req.params.id)
-//     .then(list => {
-//       list.listName = listName
-//       list
-//         .save()
-//         .then(() => res.json('list updated!'))
-//         .catch(err => res.status(400).json('Error: ' + err))
-//     })
-//     .catch(err => res.status(400).json('Error: ' + err))
-// })
+const updateList = async (req, res) => {
+  const { listName } = req.body
+  List.findById(req.params._id)
+    .then(list => {
+      list.listName = listName
+      list
+        .save()
+        .then(() => res.json('list updated!'))
+        .catch(err => res.status(400).json('Error: ' + err))
+    })
+    .catch(err => res.status(400).json('Error: ' + err))
+}
 
-// router.delete('/:id', (req, res) => {
-//   List.findByIdAndDelete(req.params.id)
-//     .then(() => res.json('List Deleted.'))
-//     .catch(err => res.status(400).json('Error: ' + err))
-// })
+const deleteList = async (req, res) => {
+  List.deleteOne({ _id: req.params._id })
+    .then(list => res.json('List Deleted.'))
+    .catch(err => res.status(400).json('Error: ' + err))
+}
 
-module.exports = router
+module.exports = {
+  getLists,
+  createList,
+  updateList,
+  deleteList
+}

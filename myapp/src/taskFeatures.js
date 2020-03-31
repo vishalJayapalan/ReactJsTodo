@@ -2,7 +2,6 @@ import React from 'react'
 
 export default class TaskFeatures extends React.Component {
   render () {
-    // console.log(this.props)
     return (
       <div className='taskFeatures'>
         <p className='notes'>Notes</p>

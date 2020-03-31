@@ -20,13 +20,8 @@ const createNewTask = (req, res) => {
 }
 
 const updateTask = (req, res) => {
-  console.log(req.params)
-  console.log(req.body)
   List.findById(req.params._id).then(list => {
-    const index = list.tasks.findIndex(task => task.taskId == req.params.taskId)
-    console.log(index)
-    list.tasks[index] = req.body
-    console.log('after change', list)
+    list.tasks.id(req.body.task._id).set(req.body.task)
     list
       .save()
       .then(() => res.json(`task updated! ${list}`))

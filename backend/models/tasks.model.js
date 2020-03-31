@@ -4,7 +4,7 @@ const TaskSchema = new mongoose.Schema({
   taskName: { type: String, required: true },
   checked: { type: Boolean, default: false },
   priority: { type: Number, default: 0 },
-  date: { type: Date, default: Date.now },
+  date: { type: String, default: 'false' },
   notes: { type: String },
   listId: { type: mongoose.Schema.Types.ObjectId }
 })
